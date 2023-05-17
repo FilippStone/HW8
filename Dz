@@ -1,0 +1,50 @@
+# Напишите функцию, которая получает на вход директорию и рекурсивно
+# обходит её и все вложенные директории. Результаты обхода сохраните в
+# файлы json, csv
+# Для дочерних объектов указывайте родительскую директорию.
+# Для каждого объекта укажите файл это или директория.
+# Для файлов сохраните его размер в байтах, а для директорий размер
+# файлов в ней с учётом всех вложенных файлов и директорий.
+
+import os
+import json
+import csv
+
+
+def find_directory(directory_path):
+    results = []
+    objects = os.listdir(directory_path)
+    for obj in objects:
+        current_path = os.path.join(directory_path, obj)
+        if os.path.isdir(current_path):
+            subdirectory_results = find_directory(current_path)
+            dir_size = sum([res['size'] for res in subdirectory_results])
+            results.append({
+                'name': obj,
+                'path': current_path,
+                'type': 'directory',
+                'size': dir_size
+            })
+            results += subdirectory_results
+        else:
+            file_size = os.path.getsize(current_path)
+            results.append({
+                'name': obj,
+                'path': current_path,
+                'type': 'file',
+                'size': file_size
+            })
+
+    with open('results.json', 'w') as f:
+        json.dump(results, f)
+
+    with open('results.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Name', 'Path', 'Type', 'Size'])
+        for res in results:
+            writer.writerow([res['name'], res['path'], res['type'], res['size']])
+
+    return results
+
+
+find_directory('C:/dis/linux')
