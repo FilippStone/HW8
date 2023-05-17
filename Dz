@@ -36,7 +36,7 @@ def find_directory(directory_path):
             })
 
     with open('results.json', 'w') as f:
-        json.dump(results, f)
+        json.dump(results, f, separators=(',\n', ':'))
 
     with open('results.csv', 'w', newline='') as f:
         writer = csv.writer(f)
