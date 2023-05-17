@@ -1,0 +1,72 @@
+# Напишите функцию, которая в бесконечном цикле
+# запрашивает имя, личный идентификатор и уровень
+# доступа (от 1 до 7).
+# После каждого ввода добавляйте новую информацию в
+# csv файл.
+# Пользователи группируются по уровню доступа.
+# Идентификатор пользователя выступает ключём для имени.
+# Убедитесь, что все идентификаторы уникальны независимо
+# от уровня доступа.
+# При перезапуске функции уже записанные в файл данные
+# должны сохраняться
+
+import csv
+# def get_user_info():
+#     name = input("Введите имя пользователя: ")
+#     user_id = input("Введите личный идентификатор пользователя: ")
+#     while True:
+#         access_level = input("Введите уровень доступа пользователя (от 1 до 7): ")
+#         if access_level.isdigit() and int(access_level) in range(1, 8):
+#             break
+#         else:
+#             print("Некорректный уровень доступа. Попробуйте еще раз.")
+#     return {"name": name, "user_id": user_id, "access_level": int(access_level)}
+#
+#
+# filename = "users.csv"
+#
+# def save_user_info(user_info):
+#     with open(filename, "a", newline="") as csvfile:
+#         writer = csv.writer(csvfile)
+#         writer.writerow([user_info["name"], user_info["user_id"], user_info["access_level"]])
+import csv
+
+
+def add_user():
+    users = {}
+    with open('users.csv', 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            user_id = int(row['ID'])
+            access_level = int(row['Access Level'])
+            if access_level not in users:
+                users[access_level] = {}
+            users[access_level][user_id] = row['name']
+
+    name = input('Введите имя пользователя: ')
+    user_id = int(input('Введите идентификатор пользователя: '))
+    is_duplicate = False
+    for level_users in users.values():
+        if user_id in level_users:
+            is_duplicate = True
+            break
+    if is_duplicate:
+        print('Пользователь с таким идентификатором уже существует')
+        return
+    access_level = int(input('Введите уровень доступа (от 1 до 7): '))
+    with open('users.csv', 'a', newline='') as f:
+        writer = csv.writer(f)
+        row = [name, user_id, access_level]
+        writer.writerow(row)
+
+    if access_level not in users:
+        users[access_level] = {}
+    users[access_level][user_id] = name
+
+    print('Пользователь успешно добавлен:')
+    print(f'Имя: {name}, ID: {user_id}, Уровень доступа: {access_level}')
+
+    return users
+
+while True:
+    users = add_user()
